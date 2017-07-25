@@ -1,4 +1,10 @@
-﻿# DPSViewer
+Note
+----
+
+I will not be mainting this fork for too long.  The goal is to hammer our the details needed to setup a more universal library and then sunset this project.  If you some how stumbled upon this project please do not contact me for support.  Also, thank you Soreepeong for all of your hardwork.  This project is amazing!
+
+
+# DPSViewer
 
 ![DOT](https://raw.githubusercontent.com/Soreepeong/DPSViewer/master/readme-images/en-dot.png)
 ![DPS](https://raw.githubusercontent.com/Soreepeong/DPSViewer/master/readme-images/en-dps.png)
