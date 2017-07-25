@@ -125,7 +125,10 @@ FFXIVDLL::FFXIVDLL(HMODULE instance) :
 			(uint64_t) mScanner.Result.Data.ActorMap,
 			(uint64_t) mScanner.Result.Data.PartyMap,
 			(uint64_t) mScanner.Result.Data.TargetMap /**/);
-		addChat("/e Initialized");
+		addChat("/e Initialized and working");
+		addChat("/e Greetings Get_ReKT =)");
+		addChat("/e I don't know how to send in marker commands");
+		addChat("/e Flag commands work <flag> <item>");
 	});
 }
 

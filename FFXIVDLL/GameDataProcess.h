@@ -146,9 +146,9 @@ struct TARGET_STRUCT {
 #pragma pack(push, 1)
 struct GAME_MESSAGE {
 	uint32_t length; // 0 ~ 3
-	uint32_t actor; // 4 ~ 7
-	uint32_t actor_copy; // 8 ~ 11
-	uint32_t _u0;  // 12 ~ 15
+	uint32_t actor; //Source // 4 ~ 7
+	uint32_t actor_copy; //Target // 8 ~ 11
+	uint32_t _u0;  //Subpackettype? // 12 ~ 15
 	enum MESSAGE_CAT1 : uint16_t {
 		C1_Combat = 0x0014
 	} message_cat1; // 16 ~ 17
@@ -164,6 +164,7 @@ struct GAME_MESSAGE {
 		MatchStatusInfo = 0x2DE,
 		MatchFound = 0x339
 		*/
+		CHAT_SHOUT = 0x67,
 		C2_DelBuff = 0x00EC,
 		C2_UseAbilityRequestV3 = 0xF7,
 		C2_UseAbilityRequestV4 = 0x10B,
@@ -319,6 +320,190 @@ struct GAME_MESSAGE {
 	};
 };
 
+
+struct GAME_MESSAGE2 {
+	uint32_t length; // 0 ~ 3
+	uint32_t actor; //Source // 4 ~ 7
+	uint32_t actor_copy; //Target // 8 ~ 11
+	uint32_t _u0;  //Subpackettype? // 12 ~ 15
+	
+	//!!!!FFXIV_ACT_PLUGIN uses a uint32_t which eats both CAT1 and CAT2!!!
+	//!!If looking at the FFXIV_ACT_PLUGIN Opcodes remember to split them into two uint16
+	//enum MESSAGE_CAT1 : uint16_t {
+	//	C1_Combat = 0x0014
+	//} message_cat1; // 16 ~ 17
+	//enum MESSAGE_CAT2 : uint16_t {
+		/* Unknown cat1s
+		ZoneChange = 0xCF,
+		FATE = 0x143,
+		MatchStartSingle = 0x6C,
+		MatchStartMultiple = 0x74,
+		MatchStartDutyRoulette = 0x76,
+		MatchStop = 0x2DB,
+		MatchConfirmed = 0x6F,
+		MatchStatusInfo = 0x2DE,
+		MatchFound = 0x339
+		*/
+	//	C2_DelBuff = 0x00EC,
+	//	C2_UseAbilityRequestV3 = 0xF7,
+	//	C2_UseAbilityRequestV4 = 0x10B,
+	//	C2_UseAbilityV4T1 = 0x00F1,
+	//	C2_UseAbilityV4T8 = 0x00F4,
+	//	C2_UseAbilityV4T16 = 0x00F5,
+	//	C2_UseAbilityV4T24 = 0x00F6,
+	//	C2_UseAbilityV4T32 = 0x00F7,
+	//	C2_StartCasting = 0x0110,
+	//	C2_SetSkillEnabledV3 = 0x0103,
+	//	C2_SetSkillEnabledV4 = 0x0121,
+	//	C2_AddBuff = 0x0141,
+	//	C2_Info1 = 0x0142,
+	//	C2_AbilityResponse = 0x0143,
+	//	C2_TargetMarker = 0x0144,
+	//	C2_ActorInfo = 0x0145,
+	//	C2_UseAbility = 0x0146,
+	//	C2_UseAoEAbility = 0x0147,
+	//	C2_RaidMarker = 0x0335,
+	//} message_cat2; // 18 ~ 19
+	//!!!!FFXIV_ACT_PLUGIN uses a uint32_t which eats both CAT1 and CAT2!!!
+	//!!If looking at the FFXIV_ACT_PLUGIN Opcodes remember to split them into two uint16
+	uint16_t test; //- This is 99% of the time for us 20
+	uint16_t test2; // - Building a better list
+	uint32_t _u1; // 20 ~ 23
+	uint32_t seqid; // 24 ~ 27
+	uint32_t _u2; // 28 ~ 31
+	union {
+		uint8_t data[65536];
+		union {
+			struct {
+				uint32_t _u1;
+				uint32_t skill;
+				uint32_t seqid;
+				uint32_t _u2;
+				uint32_t target;
+			}AbilityRequest;
+			struct {
+				uint32_t u1;
+				uint32_t u2;
+				uint32_t skill;
+				uint32_t duration_or_skid;
+				uint32_t u3;
+				uint32_t u4;
+				uint32_t seqid;
+				uint32_t u6;
+			}AbilityResponse;
+			struct {
+				uint16_t c1; // 32
+				uint16_t _u1;
+				uint32_t c5; // 36
+				uint32_t c2; // 40
+				uint32_t c3; // 44
+				uint32_t c4; // 48
+
+							 /*
+							 c1=23: dot(c2=3) hot(c2=4) / damage=c3 / skill=c5
+							 c1=15: skill cancelled / skill id=c3 / cancelled(c4=0) interrupted(c4=1)
+							 c1=6: death / by=c5
+							 c1=34: target icon (?)
+							 c1=21: buff remove / buff=c5
+							 */
+			} Info1;
+			struct {
+				uint8_t _u1[4]; // 32
+				uint32_t target; // 36
+				uint8_t _u2[4]; // 40
+				uint32_t skill; // 44
+			} StartCasting;
+			struct {
+				uint32_t primaryTarget; // 32
+				uint8_t _u1[8]; // 36
+				uint32_t skill; // 44
+				uint32_t seqid; // 48
+				uint8_t _u2[12]; // 52
+				uint32_t target; // 64
+				uint8_t _u3[8]; // 68
+				ATTACK_INFO attack;
+				uint8_t _u4[80];
+			} UseAbility;
+			struct {
+				uint32_t primaryTarget; // 32
+				uint8_t _u1[8]; // 36
+				uint32_t skill; // 44
+				uint32_t seqid; // 48
+				uint8_t _u2[16]; // 52
+				ATTACK_INFO attack[16]; // 68
+				uint32_t _u3; // 1092
+				TARGET_STRUCT targets[16]; // 1096
+			} UseAoEAbility;
+			struct {
+				uint32_t primaryTarget; // 32
+				uint32_t _u1; // 36
+				uint32_t skill; // 40
+				uint32_t seqid; // 44
+				uint8_t _u2[19]; // 48
+				uint8_t attackCount; // 67
+				uint8_t _u3[4]; // 68
+				ATTACK_INFO_V4 attack[8]; // 72
+			} UseAoEAbilityV4;
+			struct {
+				uint8_t _u1[12]; // 32
+				uint32_t HP; // 44
+				uint16_t MP; // 48
+				uint16_t TP; // 50
+				uint32_t MaxHP; // 52
+				uint16_t MaxMP; // 56
+				uint16_t buff_count; // 58
+				struct {
+					// size 16
+					uint16_t _u1;
+					uint16_t buffID;
+					uint16_t extra;
+					uint16_t _u2;
+					float duration;
+					uint32_t actorID;
+				}buffs[4]; // 60
+			} AddBuff;
+			struct {
+				uint8_t _u1[4]; // 32
+				uint32_t HP; // 36
+				uint32_t MaxHP; // 40
+				uint16_t MaxMP; // 44
+				uint16_t MP; // 46
+				uint16_t TP; // 48
+				struct {
+					// size 12
+					uint16_t buffID;
+					uint16_t extra;
+					float duration;
+					uint32_t actorID;
+				}buffs[160]; // 52
+			} DelBuff;
+			struct {
+				struct {
+					uint32_t _u1[2];
+					float x;
+					float z;
+					float y;
+				} markers[3];
+			} RaidMarker;
+			struct {
+				uint32_t _u1; // 32
+				uint32_t markerType; // 36
+				uint32_t actorId; // 40
+				uint32_t _u2[3]; // 44
+				uint32_t targetId; // 56
+			} TargetMarker;
+			struct {
+				uint16_t HP;
+				uint16_t _u1;
+				uint16_t MP;
+				uint16_t TP;
+				uint16_t GP;
+			} ActorInfo;
+		} Combat;
+	};
+};
+
+
 struct GAME_PACKET {
 	union {
 		uint32_t signature;		// 0 ~ 3		0x41A05252
@@ -326,8 +511,8 @@ struct GAME_PACKET {
 	};
 	uint64_t timestamp;		// 16 ~ 23
 	uint32_t length;		// 24 ~ 27
-	uint16_t _u2;			// 28 ~ 29
-	uint16_t message_count;	// 30 ~ 31
+	uint16_t _u2;			//Connection Channel // 28 ~ 29 
+	uint16_t message_count;	//SubPacket Count // 30 ~ 31
 	uint8_t _u3;			// 32
 	uint8_t is_gzip;		// 33
 	uint16_t _u4;			// 34 ~ 35

@@ -15,6 +15,7 @@ public:
 			PVOID OnNewChatItem;
 			PVOID HideFFXIVWindow;
 			PVOID ShowFFXIVWindow;
+			PVOID ShowTellMessage;
 		} Functions;
 		struct {
 			PVOID ActorMap;
